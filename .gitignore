@@ -1,0 +1,19 @@
+# Z API
+.env
+config.yaml
+*.db
+*.db-shm
+*.db-wal
+__pycache__/
+*.pyc
+uploads/
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
