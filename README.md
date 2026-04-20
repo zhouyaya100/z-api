@@ -1,6 +1,6 @@
 # 🛡️ Zapi
 
-轻量级 OpenAI API 网关 v3.6.0，支持多渠道路由、分组策略、配额管理、运营角色。
+轻量级 OpenAI API 网关 v3.8.2，支持多渠道路由、分组策略、配额管理、运营角色。
 
 ## 特性
 - 🔧 **多渠道路由** — 倒排索引 O(1) 查找，优先级+权重选择，自动 failover
@@ -169,7 +169,7 @@ Model 层 → 纯数据定义
 
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
-| `version` | 3.6.0 | 版本号 |
+| `version` | 3.8.2 | 版本号 |
 | `server.port` | 65000 | 服务端口 |
 | `server.workers` | 4 | Worker 数量 |
 | `security.jwt_expire_hours` | 1 | JWT 过期时间（小时） |
@@ -241,6 +241,41 @@ Model 层 → 纯数据定义
 | DELETE | /api/notifications/sent/{id} | 删除已发送通知（admin） |
 
 ## 更新日志
+
+### v3.8.2 (2026-04-18)
+
+**架构重构**
+- 统一鉴权依赖：admin_auth/operator_auth 集中到 auth.py
+- 公共工具模块 core/utils.py：消除三处重复的日期/时区函数
+- 重复路由处理器合并：logs/stats 的 admin/operator 共用实现
+- 授权模型计算统一：auth_models.py，channel_pool 倒排索引 O(1)
+
+**新功能**
+- 系统设置热更新：22 个可编辑字段 + YAML 写回，超级管理员专属
+- 错误日志系统：MaxEntriesHandler 按条数截断，独立于数据库日志
+- 用量趋势图：Chart.js 双 Y 轴折线图（请求数+Token量）
+- 用量分析分页：后端分页 + 前端"加载更多"
+- 渠道池倒排索引：O(1) 模型→渠道查找
+- 配额批量扣减：CASE WHEN 单条 SQL
+
+**UI 优化**
+- 设置页卡片式布局，6 色渐变标题栏
+- 用户页卡片式，首字母头像，4 列网格
+- 指南页卡片+彩色编号，GitHub 暗黑代码高亮
+- 仪表盘统计卡片阴影，无限额度标签，Token 进度条
+- 确认弹窗通用化，标签页持久化
+
+**Bug 修复**
+- JS falsy 陷阱（allowed_models=""）
+- 分组绑定渠道取消不保存（引入 __none__ 标记）
+- 白屏 bug（多余 }}）、v-if/v-else 配对、Chart.js canvas 时机
+- datetime.utcnow() 弃用、分组保存缺 allowed_models
+- 用量分析排序导致趋势图乱跳
+
+**性能优化**
+- N+1 查询消除：stats/tokens/users 批量查询
+- /v1/models 使用 channel_pool O(1)
+- 图表数据缓存
 
 ### v3.6.0 (2026-04-17)
 
